@@ -1,30 +1,45 @@
 #!/bin/bash
 
+# Array to store the user's choices
+declare -A choices
+
 # Function to prompt user for installation
 install_prompt() {
     read -p "Do you want to install $1? (y/n): " choice
     case "$choice" in 
-        y|Y ) return 0;;
-        n|N ) return 1;;
+        y|Y ) choices[$1]=1;;
+        n|N ) choices[$1]=0;;
         * ) echo "Invalid input. Please enter y or n."; install_prompt $1;;
     esac
 }
+
+# Prompt for all installations
+install_prompt "git"
+install_prompt "vim"
+install_prompt "Homebrew"
+install_prompt "GCC via Homebrew"
+install_prompt "Node.js"
+install_prompt "Golang"
+install_prompt "Python"
+install_prompt "Docker"
+install_prompt "Miniconda"
+install_prompt "Geany code editor"
 
 # Update and upgrade the system
 sudo apt update && sudo apt upgrade -y
 
 # Install git
-if install_prompt "git"; then
+if [ "${choices[git]}" -eq 1 ]; then
     sudo apt install -y git
 fi
 
 # Install vim
-if install_prompt "vim"; then
+if [ "${choices[vim]}" -eq 1 ]; then
     sudo apt install -y vim
 fi
 
 # Install Homebrew
-if install_prompt "Homebrew"; then
+if [ "${choices[Homebrew]}" -eq 1 ]; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -33,12 +48,12 @@ if install_prompt "Homebrew"; then
 fi
 
 # Install GCC via Homebrew
-if install_prompt "GCC via Homebrew"; then
+if [ "${choices[GCC via Homebrew]}" -eq 1 ]; then
     brew install gcc
 fi
 
 # Install Node.js (using nvm for managing Node.js versions)
-if install_prompt "Node.js"; then
+if [ "${choices[Node.js]}" -eq 1 ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -46,17 +61,17 @@ if install_prompt "Node.js"; then
 fi
 
 # Install Golang
-if install_prompt "Golang"; then
+if [ "${choices[Golang]}" -eq 1 ]; then
     sudo apt install -y golang-go
 fi
 
 # Install Python
-if install_prompt "Python"; then
+if [ "${choices[Python]}" -eq 1 ]; then
     sudo apt install -y python3 python3-pip
 fi
 
 # Install Docker
-if install_prompt "Docker"; then
+if [ "${choices[Docker]}" -eq 1 ]; then
     sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -67,7 +82,7 @@ if install_prompt "Docker"; then
 fi
 
 # Install Miniconda (a smaller version of Anaconda)
-if install_prompt "Miniconda"; then
+if [ "${choices[Miniconda]}" -eq 1 ]; then
     cd /tmp
     curl -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
@@ -78,7 +93,7 @@ if install_prompt "Miniconda"; then
 fi
 
 # Install Geany code editor
-if install_prompt "Geany code editor"; then
+if [ "${choices[Geany code editor]}" -eq 1 ]; then
     sudo apt install -y geany
 fi
 
